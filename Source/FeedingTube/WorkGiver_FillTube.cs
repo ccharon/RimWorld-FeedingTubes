@@ -10,7 +10,7 @@ namespace FeedingTube
     {
         public override bool ShouldSkip(Pawn pawn, bool forced = false)
         {
-            return shouldSkipStatic(pawn);
+            return ShouldSkipStatic(pawn);
         }
 
         public override Danger MaxPathDanger(Pawn pawn)
@@ -18,7 +18,7 @@ namespace FeedingTube
             return Danger.Deadly;
         }
 
-        public static bool shouldSkipStatic(Pawn pawn)
+        public static bool ShouldSkipStatic(Pawn pawn)
         {
             if (pawn.WorkTypeIsDisabled(WorkTypeDefOf.Hauling))
             {
@@ -38,14 +38,14 @@ namespace FeedingTube
             return pawn.Faction != Faction.OfPlayer && !pawn.RaceProps.Humanlike;
         }
 
-        public static Job generateFillJob(Pawn pawn, Thing t)
+        public static Job GenerateFillJob(Pawn pawn, Thing thing)
         {
-            if (shouldSkipStatic(pawn))
+            if (ShouldSkipStatic(pawn))
             {
                 return null;
             }
 
-            if (!(t is FeedingTube tube))
+            if (!(thing is FeedingTube tube))
             {
                 return null;
             }
@@ -58,30 +58,31 @@ namespace FeedingTube
             bool Validator(Thing x)
             {
                 return !x.IsForbidden(pawn) && pawn.CanReserve(x) && tube.Storeable(x) &&
-                       tube.foodCount() < FeedingTube.MaxFoodStored;
+                       tube.FoodCount() < FeedingTube.MaxFoodStored;
             }
 
-            var food = GenClosest.ClosestThingReachable(pawn.Position, pawn.Map,
-                ThingRequest.ForGroup(ThingRequestGroup.FoodSourceNotPlantOrTree), PathEndMode.ClosestTouch,
-                TraverseParms.For(pawn), 9999f, Validator);
-            if (food is null)
-            {
-                return null;
-            }
+            var food = GenClosest.ClosestThingReachable(
+                pawn.Position,
+                pawn.Map,
+                ThingRequest.ForGroup(ThingRequestGroup.FoodSourceNotPlantOrTree),
+                PathEndMode.ClosestTouch,
+                TraverseParms.For(pawn),
+                9999f,
+                Validator
+            );
 
-            var job = new Job(FillTube_JobDefOf.FillTube, t, food);
-            return job;
+            return food is null ? null : new Job(FillTube_JobDefOf.FillTube, thing, food);
         }
 
         public override IEnumerable<Thing> PotentialWorkThingsGlobal(Pawn pawn)
         {
             return pawn.Map.listerThings.AllThings.Where(t =>
-                t is FeedingTube tube && tube.foodCount() < FeedingTube.MaxFoodStored);
+                t is FeedingTube tube && tube.FoodCount() < FeedingTube.MaxFoodStored);
         }
 
-        public override Job JobOnThing(Pawn pawn, Thing t, bool forced = false)
+        public override Job JobOnThing(Pawn pawn, Thing thing, bool forced = false)
         {
-            return generateFillJob(pawn, t);
+            return GenerateFillJob(pawn, thing);
         }
     }
 }

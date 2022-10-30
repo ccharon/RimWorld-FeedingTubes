@@ -6,49 +6,50 @@ namespace FeedingTube
 {
     internal class Job_FillTube : JobDriver
     {
-        private const TargetIndex tubeToFill = TargetIndex.A;
-        private const TargetIndex foodToLoad = TargetIndex.B;
+        private const TargetIndex TubeToFill = TargetIndex.A;
+        private const TargetIndex FoodToLoad = TargetIndex.B;
 
         public override bool TryMakePreToilReservations(bool errorOnFailed)
         {
-            return pawn.Reserve(job.GetTarget(foodToLoad), job, 1, job.GetTarget(foodToLoad).Thing.stackCount) &&
-                   pawn.Reserve(job.GetTarget(tubeToFill), job);
+            return pawn.Reserve(job.GetTarget(FoodToLoad), job, 1, job.GetTarget(FoodToLoad).Thing.stackCount) &&
+                   pawn.Reserve(job.GetTarget(TubeToFill), job);
         }
 
         protected override IEnumerable<Toil> MakeNewToils()
         {
-            this.FailOnDespawnedNullOrForbidden(tubeToFill);
-            this.FailOnForbidden(foodToLoad);
+            this.FailOnDespawnedNullOrForbidden(TubeToFill);
+            this.FailOnForbidden(FoodToLoad);
 
-            yield return Toils_Goto.GotoThing(foodToLoad, PathEndMode.ClosestTouch);
-            var foodNeeded = FeedingTube.MaxFoodStored - ((FeedingTube)job.GetTarget(tubeToFill).Thing).foodCount();
-            job.count = job.GetTarget(foodToLoad).Thing.stackCount > foodNeeded
+            yield return Toils_Goto.GotoThing(FoodToLoad, PathEndMode.ClosestTouch);
+            var foodNeeded = FeedingTube.MaxFoodStored - ((FeedingTube)job.GetTarget(TubeToFill).Thing).FoodCount();
+            job.count = job.GetTarget(FoodToLoad).Thing.stackCount > foodNeeded
                 ? foodNeeded
-                : job.GetTarget(foodToLoad).Thing.stackCount;
+                : job.GetTarget(FoodToLoad).Thing.stackCount;
 
-            yield return Toils_Haul.StartCarryThing(foodToLoad, false, true);
-            yield return Toils_Goto.GotoThing(tubeToFill, PathEndMode.Touch);
+            yield return Toils_Haul.StartCarryThing(FoodToLoad, false, true);
+            yield return Toils_Goto.GotoThing(TubeToFill, PathEndMode.Touch);
+            
             Toil curToil = null;
             curToil = Toils_General.Wait(240).WithProgressBarToilDelay(TargetIndex.A).FailOn(delegate()
             {
                 var actor = curToil?.actor;
                 var curJob = actor?.jobs.curJob;
-                var dest = curJob?.GetTarget(tubeToFill).Thing as FeedingTube;
+                var dest = curJob?.GetTarget(TubeToFill).Thing as FeedingTube;
                 if (dest == null)
                 {
                     return true;
                 }
 
-                var food = curJob.GetTarget(foodToLoad).Thing;
+                var food = curJob.GetTarget(FoodToLoad).Thing;
                 if (!dest.Storeable(food))
                 {
                     return true;
                 }
 
-                return dest.foodCount() >= FeedingTube.MaxFoodStored;
+                return dest.FoodCount() >= FeedingTube.MaxFoodStored;
             });
-            yield return curToil.FailOnSomeonePhysicallyInteracting(tubeToFill)
-                .FailOnDespawnedNullOrForbidden(tubeToFill);
+            yield return curToil.FailOnSomeonePhysicallyInteracting(TubeToFill)
+                .FailOnDespawnedNullOrForbidden(TubeToFill);
             var toil = curToil;
             curToil = new Toil
             {
@@ -56,14 +57,14 @@ namespace FeedingTube
                 {
                     var actor = toil.actor;
                     var curJob = actor.jobs.curJob;
-                    var dest = curJob.GetTarget(tubeToFill).Thing as FeedingTube;
+                    var dest = curJob.GetTarget(TubeToFill).Thing as FeedingTube;
                     if (dest == null)
                     {
                         return;
                     }
 
-                    var max = FeedingTube.MaxFoodStored - dest.foodCount();
-                    var food = curJob.GetTarget(foodToLoad).Thing;
+                    var max = FeedingTube.MaxFoodStored - dest.FoodCount();
+                    var food = curJob.GetTarget(FoodToLoad).Thing;
                     if (max > food.stackCount)
                     {
                         dest.LoadFood(food);
@@ -71,13 +72,13 @@ namespace FeedingTube
                     else
                     {
                         Log.Message(
-                            $"Having to split off: Max{FeedingTube.MaxFoodStored} Cur{dest.foodCount()} Math{max}");
+                            $"Having to split off: Max{FeedingTube.MaxFoodStored} Cur{dest.FoodCount()} Math{max}");
                         dest.LoadFood(food.SplitOff(max));
                     }
                 }
             };
-            yield return curToil.FailOnSomeonePhysicallyInteracting(tubeToFill)
-                .FailOnDespawnedNullOrForbidden(tubeToFill);
+            yield return curToil.FailOnSomeonePhysicallyInteracting(TubeToFill)
+                .FailOnDespawnedNullOrForbidden(TubeToFill);
         }
     }
 }

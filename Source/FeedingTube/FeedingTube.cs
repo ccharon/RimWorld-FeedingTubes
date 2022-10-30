@@ -54,15 +54,7 @@ namespace FeedingTube
             }
         }
 
-        public List<IntVec3> AllSlotCellsList()
-        {
-            if (_cachedOccupiedCells == null)
-            {
-                _cachedOccupiedCells = AllSlotCells().ToList();
-            }
-
-            return _cachedOccupiedCells;
-        }
+        public List<IntVec3> AllSlotCellsList() => _cachedOccupiedCells ??= AllSlotCells().ToList();
 
         public StorageSettings GetStoreSettings()
         {
@@ -135,22 +127,16 @@ namespace FeedingTube
             };
         }
 
-        public int foodCount()
+        public int FoodCount()
         {
-            if (_foodStored == null)
-            {
-                _foodStored = new List<Thing>();
-            }
+            _foodStored ??= new List<Thing>();
 
             return _foodStored.Sum(t => t.stackCount);
         }
 
         public void LoadFood(Thing food)
         {
-            if (_foodStored == null)
-            {
-                _foodStored = new List<Thing>();
-            }
+            _foodStored ??= new List<Thing>();
 
             Log.Message($"Received {food.stackCount} food.");
             foreach (var stackable in _foodStored.Where(t => t.CanStackWith(food)))
@@ -161,8 +147,7 @@ namespace FeedingTube
                     return;
                 }
             }
-
-            Log.Message($"Loading in {food.stackCount} remainer.");
+            
             if (food.stackCount > 0)
             {
                 _foodStored.Add(food.SplitOff(food.stackCount));
@@ -171,13 +156,11 @@ namespace FeedingTube
 
         public override string GetInspectString()
         {
-            if (_foodStored == null)
-            {
-                _foodStored = new List<Thing>();
-            }
+            _foodStored ??= new List<Thing>();
 
             var builder = new StringBuilder();
             builder.Append(base.GetInspectString());
+            
             if (builder.Length > 0)
             {
                 builder.Append("\n");
@@ -215,11 +198,11 @@ namespace FeedingTube
                 yield return floatMenuOption;
             }
 
-            if (foodCount() >= MaxFoodStored)
+            if (FoodCount() >= MaxFoodStored)
             {
                 yield return new FloatMenuOption("Fill (full)", null);
             }
-            else if (WorkGiver_FillTube.shouldSkipStatic(selPawn))
+            else if (WorkGiver_FillTube.ShouldSkipStatic(selPawn))
             {
                 yield return new FloatMenuOption("Fill (unwilling)", null);
             }
@@ -227,7 +210,7 @@ namespace FeedingTube
             {
                 yield return new FloatMenuOption("Fill", () =>
                 {
-                    var doFill = WorkGiver_FillTube.generateFillJob(selPawn, this);
+                    var doFill = WorkGiver_FillTube.GenerateFillJob(selPawn, this);
                     if (doFill != null)
                     {
                         selPawn.jobs.TryTakeOrderedJob(doFill);
@@ -248,7 +231,7 @@ namespace FeedingTube
 
             foreach (var pawn in bed.CurOccupants)
             {
-                if (foodCount() == 0)
+                if (FoodCount() == 0)
                 {
                     return;
                 }
