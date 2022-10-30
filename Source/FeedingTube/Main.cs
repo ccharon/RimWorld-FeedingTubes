@@ -1,19 +1,20 @@
 ﻿using RimWorld;
 using Verse;
 
-namespace FeedingTube;
-
-[StaticConstructorOnStartup]
-public static class Main
+namespace FeedingTube
 {
-    public static readonly NeedDef ThirstDef;
-
-    static Main()
+    [StaticConstructorOnStartup]
+    public static class Main
     {
-        ThirstDef = DefDatabase<NeedDef>.GetNamedSilentFail("DBHThirst");
-        if (ThirstDef != null)
+        public static readonly NeedDef ThirstDef;
+
+        static Main()
         {
-            Log.Message("[FeedingTube]: Dubs Bad Hygiene is loaded, tube will fill thirst need when feeding");
+            ThirstDef = DefDatabase<NeedDef>.GetNamedSilentFail("DBHThirst");
+            if (ThirstDef != null)
+            {
+                Log.Message("[FeedingTube]: Dubs Bad Hygiene is loaded, tube will fill thirst need when feeding");
+            }
         }
     }
 }

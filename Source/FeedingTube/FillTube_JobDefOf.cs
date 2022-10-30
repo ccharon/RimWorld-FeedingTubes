@@ -1,10 +1,11 @@
 ﻿using RimWorld;
 using Verse;
 
-namespace FeedingTube;
-
-[DefOf]
-internal class FillTube_JobDefOf
+namespace FeedingTube
 {
-    public static JobDef FillTube;
+    [DefOf]
+    internal class FillTube_JobDefOf
+    {
+        public static JobDef FillTube;
+    }
 }
