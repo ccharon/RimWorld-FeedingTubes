@@ -1,5 +1,8 @@
 # FeedingTubes
-
+This fork provides feeding tubes for all beds not only medical related ones. Because reasons! :P
+
+All other changes were made to make the project compile with rider and to make rider happy with the code in general.
+
 ![Image](https://i.imgur.com/buuPQel.png)
 
 Update of Teh Flamin' Tacos mod
