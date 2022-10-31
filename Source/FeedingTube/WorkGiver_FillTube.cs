@@ -58,7 +58,7 @@ namespace FeedingTube
             bool Validator(Thing x)
             {
                 return !x.IsForbidden(pawn) && pawn.CanReserve(x) && tube.Storeable(x) &&
-                       tube.FoodCount() < FeedingTube.MaxFoodStored;
+                       tube.FoodCount() < FeedingTube.MaxFoodStored / 2;
             }
 
             var food = GenClosest.ClosestThingReachable(
