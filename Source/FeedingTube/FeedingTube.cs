@@ -9,7 +9,8 @@ namespace FeedingTube
 {
     public class FeedingTube : Building, ISlotGroupParent
     {
-        public const int MaxFoodStored = 75;
+        public const int MaxFoodStored = 10;
+        public const int MinFoodToTriggerRefill = 2;
         private List<IntVec3> _cachedOccupiedCells;
         private List<Thing> _foodStored = new List<Thing>();
         private StorageSettings _settings;
@@ -37,8 +38,7 @@ namespace FeedingTube
         {
             if (Faction == Faction.OfPlayer && newItem.def.storedConceptLearnOpportunity != null)
             {
-                LessonAutoActivator.TeachOpportunity(newItem.def.storedConceptLearnOpportunity,
-                    OpportunityType.GoodToKnow);
+                LessonAutoActivator.TeachOpportunity(newItem.def.storedConceptLearnOpportunity, OpportunityType.GoodToKnow);
             }
         }
 
@@ -48,10 +48,7 @@ namespace FeedingTube
 
         public virtual IEnumerable<IntVec3> AllSlotCells()
         {
-            foreach (var intVec in GenAdj.CellsOccupiedBy(this))
-            {
-                yield return intVec;
-            }
+            return GenAdj.CellsOccupiedBy(this);
         }
 
         public List<IntVec3> AllSlotCellsList() => _cachedOccupiedCells ??= AllSlotCells().ToList();
@@ -86,10 +83,8 @@ namespace FeedingTube
             base.PostMake();
             _settings = new StorageSettings(this);
             _foodStored = new List<Thing>();
-            if (def.building.defaultStorageSettings != null)
-            {
-                _settings.CopyFrom(def.building.defaultStorageSettings);
-            }
+            
+            if (def.building.defaultStorageSettings != null)  _settings.CopyFrom(def.building.defaultStorageSettings);
         }
 
         public override void SpawnSetup(Map map, bool respawningAfterLoad)
@@ -107,15 +102,8 @@ namespace FeedingTube
 
         public override IEnumerable<Gizmo> GetGizmos()
         {
-            foreach (var gizmo in base.GetGizmos())
-            {
-                yield return gizmo;
-            }
-
-            foreach (var gizmo2 in StorageSettingsClipboard.CopyPasteGizmosFor(_settings))
-            {
-                yield return gizmo2;
-            }
+            foreach (var gizmo in base.GetGizmos()) yield return gizmo;
+            foreach (var gizmo2 in StorageSettingsClipboard.CopyPasteGizmosFor(_settings)) yield return gizmo2;
 
             yield return new Command_Action
             {
@@ -130,10 +118,14 @@ namespace FeedingTube
         public int FoodCount()
         {
             _foodStored ??= new List<Thing>();
-
             return _foodStored.Sum(t => t.stackCount);
         }
 
+        /// <summary>
+        /// adding food to storage, first try to add to an existing stack of food, if that is not possible a new stack
+        /// of food will be added
+        /// </summary>
+        /// <param name="food"></param>
         public void LoadFood(Thing food)
         {
             _foodStored ??= new List<Thing>();
@@ -142,16 +134,10 @@ namespace FeedingTube
             foreach (var stackable in _foodStored.Where(t => t.CanStackWith(food)))
             {
                 stackable.TryAbsorbStack(food, true);
-                if (food.stackCount <= 0)
-                {
-                    return;
-                }
+                if (food.stackCount <= 0) return;
             }
             
-            if (food.stackCount > 0)
-            {
-                _foodStored.Add(food.SplitOff(food.stackCount));
-            }
+            if (food.stackCount > 0) _foodStored.Add(food.SplitOff(food.stackCount));
         }
 
         public override string GetInspectString()
@@ -161,27 +147,17 @@ namespace FeedingTube
             var builder = new StringBuilder();
             builder.Append(base.GetInspectString());
             
-            if (builder.Length > 0)
-            {
-                builder.Append("\n");
-            }
+            if (builder.Length > 0) builder.Append("\n");
 
             builder.Append("stored:");
-            foreach (var food in _foodStored)
-            {
-                builder.Append($"\n{food.Label}");
-            }
+            foreach (var food in _foodStored) builder.Append($"\n{food.Label}");
 
             return builder.ToString();
         }
 
-        public void Empty()
+        private void Empty()
         {
-            foreach (var food in _foodStored)
-            {
-                GenPlace.TryPlaceThing(food, Position, Map, ThingPlaceMode.Near);
-            }
-
+            foreach (var food in _foodStored) GenPlace.TryPlaceThing(food, Position, Map, ThingPlaceMode.Near);
             _foodStored.Clear();
         }
 
@@ -191,32 +167,32 @@ namespace FeedingTube
             base.Destroy(mode);
         }
 
+        /// <summary>
+        /// creating menu entries
+        /// </summary>
+        /// <param name="selPawn"></param>
+        /// <returns>a list of menu entries</returns>
         public override IEnumerable<FloatMenuOption> GetFloatMenuOptions(Pawn selPawn)
         {
-            foreach (var floatMenuOption in base.GetFloatMenuOptions(selPawn))
-            {
-                yield return floatMenuOption;
-            }
+            // getting all entries specific to the selected pawn
+            foreach (var floatMenuOption in base.GetFloatMenuOptions(selPawn)) yield return floatMenuOption;
 
             if (FoodCount() >= MaxFoodStored)
-            {
+                // the feeding tube is full
                 yield return new FloatMenuOption("Fill (full)", null);
-            }
+            
             else if (WorkGiver_FillTube.ShouldSkipStatic(selPawn))
-            {
+                // the pawn will not do it
                 yield return new FloatMenuOption("Fill (unwilling)", null);
-            }
+            
             else
-            {
+                // feeding tube can be be filled, when clicked a job will be stqrted
                 yield return new FloatMenuOption("Fill", () =>
-                {
-                    var doFill = WorkGiver_FillTube.GenerateFillJob(selPawn, this);
-                    if (doFill != null)
                     {
-                        selPawn.jobs.TryTakeOrderedJob(doFill);
+                        var doFill = WorkGiver_FillTube.GenerateFillJob(selPawn, this);
+                        if (doFill != null) selPawn.jobs.TryTakeOrderedJob(doFill);
                     }
-                });
-            }
+                );
         }
 
         public override void Tick()
@@ -224,36 +200,20 @@ namespace FeedingTube
             base.Tick();
 
             var bed = (Position + Rotation.FacingCell).GetFirstThing<Building_Bed>(Map);
-            if (bed == null || !bed.CurOccupants.Any())
-            {
-                return;
-            }
+            if (bed == null || !bed.CurOccupants.Any()) return;
 
             foreach (var pawn in bed.CurOccupants)
             {
-                if (FoodCount() == 0)
-                {
-                    return;
-                }
+                if (FoodCount() == 0) return;
                 
-                if (!FeedPatientUtility.IsHungry(pawn))
-                {
-                    continue;
-                }
-
+                if (!FeedPatientUtility.IsHungry(pawn)) continue;
                 var currentFood = _foodStored.First();
                 pawn.needs.food.CurLevel += currentFood.Ingested(pawn, pawn.needs.food.NutritionWanted);
                 
-                if (currentFood.Destroyed)
-                {
-                    _foodStored.Remove(currentFood);
-                }
+                if (currentFood.Destroyed) _foodStored.Remove(currentFood);
 
-                if (Main.ThirstDef == null)
-                {
-                    continue;
-                }
-
+                // thirst is added by dubs bath hygiene
+                if (Main.ThirstDef == null) continue;
                 var thirstNeed = pawn.needs.TryGetNeed(Main.ThirstDef);
                 thirstNeed.CurLevel = thirstNeed.MaxLevel;
             }
