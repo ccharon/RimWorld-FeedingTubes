@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Manifest>
+  <identifier>FeedingTubes</identifier>
+  <version>1.0.0</version>
+  <dependencies />
+  <incompatibleWith />
+  <loadBefore />
+  <loadAfter />
+  <manifestUri>https://raw.githubusercontent.com/ccharon/RimWorld-FeedingTubes/main/About/Manifest.xml</manifestUri>
+  <downloadUri>https://github.com/ccharon/RimWorld-FeedingTubes/releases</downloadUri>
+</Manifest>

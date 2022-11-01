@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+  <WorkGiverDef>
+    <defName>nukulartechniker_fill_tube</defName>
+    <!-- What gets shown when hovering over the WorkGiver in the Work tab -->
+    <label>fill a feeding tube with food</label>
+    <!-- The associated WorkGiver -->
+    <giverClass>FeedingTube.WorkGiver_FillTube</giverClass>
+    <!-- Under what category it falls in the Work Tab -->
+    <workType>BasicWorker</workType>
+    <!-- Shown when prioritising via the right-click menu (e.g. consume rice, haul bricks) -->
+    <verb>fill</verb>
+    <!-- Shown when the pawn is doing the job -->
+    <gerund>filling</gerund>
+    <!-- WorkTypes can contain multiple Jobs, this determines where in the Worktype it comes-->
+    <priorityInType>2</priorityInType>
+    <requiredCapacities>
+      <li>Manipulation</li>
+    </requiredCapacities>
+  </WorkGiverDef>
+  
+  <JobDef>
+    <defName>nukulartechniker_fill_tube</defName>
+    <driverClass>FeedingTube.JobDriver_FillTube</driverClass>
+    <reportString>filling TargetA.</reportString>
+    <casualInterruptible>false</casualInterruptible>
+    <suspendable>false</suspendable>
+  </JobDef>
+
+  <ThingDef ParentName="BuildingBase">
+    <defName>FeedingTube</defName>
+    <label>feeding tube</label>
+    <description>Forcefeed patients food.</description>
+    <thingClass>FeedingTube.FeedingTube</thingClass>
+    <graphicData>
+      <texPath>Things/Building/Production/NutrientDispenser</texPath>
+      <graphicClass>Graphic_Multi</graphicClass>
+      <damageData>
+        <rect>(0.05,0.1,0.9,0.9)</rect>
+        <cornerTL>Damage/Corner</cornerTL>
+        <cornerTR>Damage/Corner</cornerTR>
+      </damageData>
+    </graphicData>
+    <altitudeLayer>Building</altitudeLayer>
+    <passability>Impassable</passability>
+    <fillPercent>0.5</fillPercent>
+    <pathCost>42</pathCost>
+    <canOverlapZones>false</canOverlapZones>
+    <building>
+      <fixedStorageSettings>
+        <priority>Important</priority>
+        <filter>
+          <categories>
+            <li>FoodRaw</li>
+            <li>FoodMeals</li>
+          </categories>
+          <thingDefs>
+            <li>Pemmican</li>
+            <li>Kibble</li>
+          </thingDefs>
+          <specialFiltersToDisallow>
+            <li>AllowPlantFood</li>
+          </specialFiltersToDisallow>
+        </filter>
+      </fixedStorageSettings>
+      <defaultStorageSettings>
+        <priority>Important</priority>
+        <filter>
+          <categories>
+            <li>FoodRaw</li>
+            <li>FoodMeals</li>
+          </categories>
+          <thingDefs>
+            <li>Pemmican</li>
+            <li>Kibble</li>
+          </thingDefs>
+          <disallowedThingDefs>
+            <li>Meat_Human</li>
+            <li>Meat_Megaspider</li>
+          </disallowedThingDefs>
+        </filter>
+      </defaultStorageSettings>
+      <buildingTags>
+        <li>Misc</li>
+      </buildingTags>
+    </building>
+    <inspectorTabs>
+      <li>ITab_Storage</li>
+    </inspectorTabs>
+    <castEdgeShadows>true</castEdgeShadows>
+    <statBases>
+      <WorkToBuild>300</WorkToBuild>
+      <MaxHitPoints>100</MaxHitPoints>
+      <Flammability>0.5</Flammability>
+    </statBases>
+    <costList>
+      <Steel>15</Steel>
+    </costList>
+    <tickerType>Normal</tickerType>
+    <rotatable>true</rotatable>
+    <neverMultiSelect>true</neverMultiSelect>
+    <designationCategory>Production</designationCategory>
+    <surfaceType>Item</surfaceType>
+    <constructEffect>ConstructMetal</constructEffect>
+    <researchPrerequisites>
+      <li>VitalsMonitor</li>
+    </researchPrerequisites>
+  </ThingDef>
+</Defs>
