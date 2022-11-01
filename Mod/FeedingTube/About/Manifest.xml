@@ -6,6 +6,6 @@
   <incompatibleWith />
   <loadBefore />
   <loadAfter />
-  <manifestUri>https://raw.githubusercontent.com/ccharon/RimWorld-FeedingTubes/main/About/Manifest.xml</manifestUri>
+  <manifestUri>https://raw.githubusercontent.com/ccharon/RimWorld-FeedingTubes/main/Mod/FeedingTube/About/Manifest.xml</manifestUri>
   <downloadUri>https://github.com/ccharon/RimWorld-FeedingTubes/releases</downloadUri>
 </Manifest>
