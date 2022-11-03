@@ -6,8 +6,6 @@ using Verse.AI;
 
 namespace FeedingTube
 {
-    // ReSharper disable once ClassNeverInstantiated.Global
-    // ReSharper disable once InconsistentNaming
     internal class WorkGiver_FillTube : WorkGiver_Scanner
     {
         public override bool ShouldSkip(Pawn pawn, bool forced = false)

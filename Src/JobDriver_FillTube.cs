@@ -3,8 +3,6 @@ using Verse.AI;
 
 namespace FeedingTube
 {
-    // ReSharper disable once InconsistentNaming
-    // ReSharper disable once UnusedType.Global
     internal class JobDriver_FillTube : JobDriver
     {
         private const TargetIndex TubeToFill = TargetIndex.A;

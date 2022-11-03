@@ -7,7 +7,6 @@ using Verse;
 
 namespace FeedingTube
 {
-    // ReSharper disable once ClassNeverInstantiated.Global
     public class FeedingTube : Building, ISlotGroupParent
     {
         public const int MaxFoodStored = 10;

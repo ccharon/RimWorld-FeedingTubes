@@ -3,7 +3,6 @@ using Verse;
 
 namespace FeedingTube
 {
-    // ReSharper disable once ClassNeverInstantiated.Global
     public class FeedingTubeMod : Mod
     {
         internal static readonly NeedDef ThirstDef;
