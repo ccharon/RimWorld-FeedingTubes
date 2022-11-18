@@ -1,3 +1,0 @@
-# Changelog for FeedingTubes
-
-1.0.0 - First publish after refactoring

@@ -1,0 +1,19 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.168
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{E3BD214A-6783-11ED-8B48-2EE2F046C8D7}") = "FeedingTube", "FeedingTube\FeedingTube.csproj", "{BA6E3314-1ECC-4F43-A226-FEB7AACCE695}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BA6E3314-1ECC-4F43-A226-FEB7AACCE695}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA6E3314-1ECC-4F43-A226-FEB7AACCE695}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA6E3314-1ECC-4F43-A226-FEB7AACCE695}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA6E3314-1ECC-4F43-A226-FEB7AACCE695}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
