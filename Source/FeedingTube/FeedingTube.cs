@@ -19,6 +19,8 @@ namespace FeedingTube
         public FeedingTube()
         {
             _slotGroup = new SlotGroup(this);
+            GroupingLabel = "feeding tube";
+            GroupingOrder = 0;
         }
 
         public void Notify_SettingsChanged()
@@ -28,6 +30,8 @@ namespace FeedingTube
         public bool StorageTabVisible => true;
 
         public bool IgnoreStoredThingsBeauty => def.building.ignoreStoredThingsBeauty;
+        public string GroupingLabel { get; }
+        public int GroupingOrder { get; }
 
         public SlotGroup GetSlotGroup()
         {
