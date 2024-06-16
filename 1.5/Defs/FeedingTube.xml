@@ -43,7 +43,7 @@
     </graphicData>
     <altitudeLayer>Building</altitudeLayer>
     <passability>Impassable</passability>
-    <fillPercent>0.5</fillPercent>
+    <fillPercent>1</fillPercent>
     <pathCost>42</pathCost>
     <canOverlapZones>false</canOverlapZones>
     <building>
